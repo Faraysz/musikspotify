@@ -9,9 +9,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: SpotifyLoginPage(),
-    );
+    return MaterialApp(home: SpotifyLoginPage());
   }
 }
 
@@ -20,9 +18,18 @@ class SpotifyLoginPage extends StatelessWidget {
 
   SpotifyLoginPage({super.key});
 
-  void login() async {
-    final token = await spotifyAuth.authenticate();
-    print("Access Token: $token");
+  void login(BuildContext context) async {
+    try {
+      final token = await spotifyAuth.authenticate();
+      print("Access Token: $token");
+    } catch (e) {
+      print("Login failed;$e");
+      //misal tampilkan dialog error
+      ScaffoldMessenger.of(context).showSnackBar(
+        snackBar(content: Text("Login failed: $e"),
+        duration: const Duration(seconds: 3),
+      ));
+    }
   }
 
   @override
@@ -31,10 +38,14 @@ class SpotifyLoginPage extends StatelessWidget {
       appBar: AppBar(title: const Text("Login Spotify")),
       body: Center(
         child: ElevatedButton(
-          onPressed: login,
+          onPressed: () => login(context),
           child: const Text("Login Spotify"),
         ),
       ),
     );
+  }
+  
+  SnackBar snackBar({required Text content, required Duration duration}) {
+    return SnackBar(content: content, duration: duration);
   }
 }
